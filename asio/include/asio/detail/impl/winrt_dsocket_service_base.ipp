@@ -490,9 +490,11 @@ asio::error_code winrt_dsocket_service_base::do_bind(
   if (!ec) try
   {
     async_manager_.sync(impl.socket_->BindEndpointAsync(
-          ref new Windows::Networking::HostName(
-            winrt_utils::string(addr_string)),
-          winrt_utils::string(port)), ec);
+      INET_IS_ADDR_UNSPECIFIED(
+      reinterpret_cast<const socket_addr_type*>(addr)->sa_family, addr) ?
+      nullptr : ref new Windows::Networking::HostName(
+      winrt_utils::string(addr_string)),
+      port ? winrt_utils::string(port) : ""), ec);
   }
   catch (Platform::Exception^ e)
   {
